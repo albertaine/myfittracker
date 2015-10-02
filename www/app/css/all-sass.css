@@ -1,20 +1,17 @@
-$but_backgr : #3CE222;
-$but_color : #E211AC;
-
 .btn2 {
-	background: $but_backgr;
-	color: $but_color;
-}
+  background: #3CE222;
+  color: #E211AC; }
 
 /*
 .navbar { margin-bottom:0px;}
 */
-
 /* fix fixed-bar */
-body { padding-top: 40px; }
+body {
+  padding-top: 40px; }
+
 @media screen and (max-width: 768px) {
-  body { padding-top: 0; }
-}
+  body {
+    padding-top: 0; } }
 
 /* fix fixed-bar jumping to in-page anchor issue */
 *[id]:before {
@@ -22,17 +19,13 @@ body { padding-top: 40px; }
   content: " ";
   margin-top: -75px;
   height: 75px;
-  visibility: hidden;
-}
+  visibility: hidden; }
 
 .eye-blue {
-  color: blue;
-}
+  color: blue; }
 
 .eye-green {
-  color: green;
-}
+  color: green; }
 
 .eye-brown {
-  color: brown;
-}
+  color: brown; }

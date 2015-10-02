@@ -1,0 +1,48 @@
+<h1>Users</h1>
+
+<a ui-sref="Users.state1">State1</a>
+<a ui-sref="Users.state2">State2</a>
+
+<div ui-view></div>
+
+<br/>
+<br/>
+<br/>
+
+<h2>{{usc.desc}}</h2>
+
+<!--<pre>{{usc}}</pre>-->
+
+<!--
+<div class="btn-group">
+    <label class="btn btn-success" ng-model="usc.eyeColorModel" btn-radio="'green'" ng-click="usc.changeColor('green')" uncheckable>Green</label>
+    <label class="btn btn-success" ng-model="usc.eyeColorModel" btn-radio="'blue'" ng-click="usc.changeColor('blue')" uncheckable>Blue</label>
+    <label class="btn btn-success" ng-model="usc.eyeColorModel" btn-radio="'brown'" ng-click="usc.changeColor('brown')" uncheckable>Brown</label>
+</div>
+-->
+<div class="btn-group">
+    <label class="btn btn-success" ng-model="eyeColor" btn-radio="'green'" uncheckable>Зеленый</label>
+    <label class="btn btn-info" ng-model="eyeColor" btn-radio="'blue'" uncheckable>Синий</label>
+    <label class="btn btn-success" ng-model="eyeColor" btn-radio="'brown'" uncheckable>Коричневый</label>
+</div>
+
+<!--<pre>{{usc.eyeColorModel}}</pre>-->
+<pre>{{eyeColor}}</pre>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Eye Color</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="user in usc.list track by $index">
+        <td>{{$index+1}}</td>
+        <td>{{user.name}}</td>
+        <td ng-class="{'eye-{{user.eyeColor}}' : 1}">{{user.eyeColor|rusEyeColor}}</td>
+        <td>{{user.balance|rusCurrencyFormat}}</td>
+    </tr>
+    </tbody>
+</table>
