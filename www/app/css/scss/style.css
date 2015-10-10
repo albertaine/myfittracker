@@ -7,7 +7,7 @@
 */
 /* fix fixed-bar */
 body {
-  padding-top: 40px; }
+  padding-top: 60px; }
 
 @media screen and (max-width: 768px) {
   body {
@@ -28,5 +28,8 @@ body {
 
 .eye-brown {
   color: brown; }
+
+.pointer {
+  cursor: pointer; }
 
 /*# sourceMappingURL=style.css.map */

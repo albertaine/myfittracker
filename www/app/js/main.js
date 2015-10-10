@@ -3,11 +3,14 @@
 
 	angular.module('MyFitTracker', [
 		/*'ngRoute'*/'ui.router',
+		'MyFitTracker.Fire',
 		'MyFitTracker.Home',
 		'MyFitTracker.User',
-		'MyFitTracker.Users'
+		'MyFitTracker.Users',
+		'MyFitTracker.Auth',
+		'MyFitTracker.Navbar'
 	])
-		.constant('FIREBASE_URL', 'http://....')
+		.constant('FIREBASE_URL', 'https://myfittracker.firebaseio.com/')
 		.value('configOptions', {
 			lang: 'ru',
 			timezone: '+3'
@@ -49,10 +52,26 @@
 	}
 
 	// @ngInject
-	function Run(FIREBASE_URL, configOptions) {
+	function Run(FIREBASE_URL, configOptions, $rootScope) {
 		console.log('...Run Main');
 		console.log(FIREBASE_URL);
 		console.log(configOptions);
+
+		$rootScope.alerts = [
+/*
+			{ type: 'danger', msg: 'Oh snap! Change a few things up and try submitting again.' },
+			{ type: 'success', msg: 'Well done! You successfully read this important alert message.' }
+*/
+		];
+
+		$rootScope.addAlert = function(_type, _msg) {
+			_type = _type || 'warning';
+			$rootScope.alerts.push({type: _type, msg: _msg});
+		};
+
+		$rootScope.closeAlert = function(index) {
+			$rootScope.alerts.splice(index, 1);
+		};
 	}
 
 })();

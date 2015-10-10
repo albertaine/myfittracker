@@ -11,8 +11,6 @@
 <body>
 	<div class="container" ng-include="'ht/status/navbar.html'"></div>
 
-	<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
-
 	<div class="container view-container" ui-view></div>
 
 	<script src="js/_concat/vendor.js"></script>

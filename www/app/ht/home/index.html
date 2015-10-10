@@ -1,3 +1,48 @@
 <h1>Home</h1>
 
+<div class="container">
+
+    <div class="row" ng-show="hc.userLogin">
+        <div class="alert" ng-class="{'alert-success' : !hc.error, 'alert-danger' : hc.error }">
+            {{hc.userLogin}}
+        </div>
+    </div>
+
+    <div class="row" ng-if="!userLoggedIn">
+        <!--<form class="form-inline" name="registerUserForm" ng-submit="hc.registerUser()" novalidate>-->
+        <!--<form name="registerUserForm" ng-submit="hc.registerUser(hc.newUser)" novalidate>-->
+        <form name="registerUserForm" novalidate>
+            <div class="form-group">
+                <!--<div class="form-group" ng-class="{'has-error' : newUserForm.$invalid && userName.$dirty}">-->
+                <label class="sr-only" for="email">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Email" ng-model="hc.newUser.email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label class="sr-only" for="pass">Password</label>
+                <input type="password" class="form-control" id="pass" placeholder="Password" ng-model="hc.newUser.password" name="password" required>
+            </div>
+            <button type="submit" ng-hide="createUse" class="btn btn-default" ng-click="hc.loginUser(hc.newUser)" ng-disabled="registerUserForm.$invalid">Login User</button>
+
+            <a href="" ng-click="createUse = !createUse">
+                <span ng-show="createUse">Вход</span>
+                <span ng-show="!createUse">Регистрация</span>
+            </a>
+
+            <button type="submit" ng-show="createUse" class="btn btn-default" ng-click="hc.registerUser(hc.newUser)" ng-disabled="registerUserForm.$invalid">Register User</button>
+        </form>
+
+<!--
+        <div class="error" ng-show="registerUserForm.$invalid">
+            Ошибка заполнения полей формы
+        </div>
+-->
+
+        <pre>
+            <!--{{ registerUserForm | json }}-->
+            {{ hc.newUser | json }}
+        </pre>
+
+    </div>
+</div>
+
 <pre>{{hc}}</pre>

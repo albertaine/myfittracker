@@ -13,6 +13,7 @@ gulp.task('css-vendor', function () {
 		'app/bower_components/bootstrap/dist/css/bootstrap.css',
 		'app/bower_components/bootstrap/dist/css/bootstrap-theme.css',
 		'app/bower_components/angular-bootstrap/ui-bootstrap-csp.css',
+		'app/bower_components/angular-ui-grid/ui-grid.css',
 		'app/bower_components/angular/angular-csp.css'
 	])
 		.pipe(concat('vendor.css'))
@@ -24,6 +25,7 @@ gulp.task('css-vendor-prod', function () {
 		'app/bower_components/bootstrap/dist/css/bootstrap.min.css',
 		'app/bower_components/bootstrap/dist/css/bootstrap-theme.min.css',
 		'app/bower_components/angular-bootstrap/ui-bootstrap-csp.css',
+		'app/bower_components/angular-ui-grid/ui-grid.min.css',
 		'app/bower_components/angular/angular-csp.css'
 	])
 		.pipe(concat('vendor.css'))
@@ -62,10 +64,13 @@ gulp.task('js-vendor', function () {
 	gulp.src([
 		'app/bower_components/angular/angular.js',
 		'app/bower_components/angular-ui-router/release/angular-ui-router.js',
+		'app/bower_components/angular-ui-grid/ui-grid.js',
 		'app/bower_components/jquery/dist/jquery.js',
 		'app/bower_components/bootstrap/dist/js/bootstrap.js',
 		'app/bower_components/angular-bootstrap/ui-bootstrap.js',
-		'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js'
+		'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+		'app/bower_components/firebase/firebase-debug.js',
+		'app/bower_components/angularfire/dist/angularfire.js'
 	])
 		.pipe(concat('vendor.js'))
 		.pipe(gulp.dest('app/js/_concat'));
@@ -75,10 +80,13 @@ gulp.task('js-vendor-prod', function () {
 	gulp.src([
 		'app/bower_components/angular/angular.min.js',
 		'app/bower_components/angular-ui-router/release/angular-ui-router.min.js',
+		'app/bower_components/angular-ui-grid/ui-grid.min.js',
 		'app/bower_components/jquery/dist/jquery.min.js',
 		'app/bower_components/bootstrap/dist/js/bootstrap.min.js',
 		'app/bower_components/angular-bootstrap/ui-bootstrap.min.js',
-		'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'
+		'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+		'app/bower_components/firebase/firebase.js',
+		'app/bower_components/angularfire/dist/angularfire.min.js'
 	])
 		.pipe(concat('vendor.js'))
 		.pipe(gulp.dest('build/js/_concat'));
