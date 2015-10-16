@@ -3,12 +3,15 @@
 
 	angular.module('MyFitTracker', [
 		/*'ngRoute'*/'ui.router',
+		'ui.bootstrap',
 		'MyFitTracker.Fire',
 		'MyFitTracker.Home',
 		'MyFitTracker.User',
 		'MyFitTracker.Users',
 		'MyFitTracker.Auth',
-		'MyFitTracker.Navbar'
+		'MyFitTracker.Navbar',
+		'MyFitTracker.Sign',
+		'MyFitTracker.Profile'
 	])
 		.constant('FIREBASE_URL', 'https://myfittracker.firebaseio.com/')
 		.value('configOptions', {
@@ -64,13 +67,17 @@
 */
 		];
 
-		$rootScope.addAlert = function(_type, _msg) {
+		$rootScope.addAlert = function(_msg, _type) {
 			_type = _type || 'warning';
 			$rootScope.alerts.push({type: _type, msg: _msg});
 		};
 
 		$rootScope.closeAlert = function(index) {
 			$rootScope.alerts.splice(index, 1);
+		};
+
+		$rootScope.currentUser = {
+			fullName: null
 		};
 	}
 

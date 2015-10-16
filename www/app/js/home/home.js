@@ -9,7 +9,7 @@
         .controller('HomeCtrl', HomeController);
 
     // @ngInject
-    function HomeController ($scope, Authentication) {
+    function HomeController ($scope, Authentication, $state) {
         var self = this;
         self.desc = 'Домашняя';
 
@@ -47,8 +47,10 @@
                 .then(function(authData) {
                     self.userLogin = 'User logged in as ' + authData.uid;
                     self.error = false;
-                    Authentication.checkAuth();
+                    //Authentication.checkAuth();
                     console.log('=== auth === Logged in as ' + authData.uid);
+
+                    $state.go('Users');
                 })
                 .catch(function(error) {
                     self.userLogin = 'Authentication failed ' + error;

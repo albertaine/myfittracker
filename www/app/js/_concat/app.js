@@ -3,12 +3,15 @@
 
 	angular.module('MyFitTracker', [
 		/*'ngRoute'*/'ui.router',
+		'ui.bootstrap',
 		'MyFitTracker.Fire',
 		'MyFitTracker.Home',
 		'MyFitTracker.User',
 		'MyFitTracker.Users',
 		'MyFitTracker.Auth',
-		'MyFitTracker.Navbar'
+		'MyFitTracker.Navbar',
+		'MyFitTracker.Sign',
+		'MyFitTracker.Profile'
 	])
 		.constant('FIREBASE_URL', 'https://myfittracker.firebaseio.com/')
 		.value('configOptions', {
@@ -64,13 +67,17 @@
 */
 		];
 
-		$rootScope.addAlert = function(_type, _msg) {
+		$rootScope.addAlert = function(_msg, _type) {
 			_type = _type || 'warning';
 			$rootScope.alerts.push({type: _type, msg: _msg});
 		};
 
 		$rootScope.closeAlert = function(index) {
 			$rootScope.alerts.splice(index, 1);
+		};
+
+		$rootScope.currentUser = {
+			fullName: null
 		};
 	}
 
@@ -153,7 +160,7 @@ console.log(rep1.count, rep2.count);
         .controller('HomeCtrl', HomeController);
 
     // @ngInject
-    function HomeController ($scope, Authentication) {
+    function HomeController ($scope, Authentication, $state) {
         var self = this;
         self.desc = 'Домашняя';
 
@@ -191,8 +198,10 @@ console.log(rep1.count, rep2.count);
                 .then(function(authData) {
                     self.userLogin = 'User logged in as ' + authData.uid;
                     self.error = false;
-                    Authentication.checkAuth();
+                    //Authentication.checkAuth();
                     console.log('=== auth === Logged in as ' + authData.uid);
+
+                    $state.go('Users');
                 })
                 .catch(function(error) {
                     self.userLogin = 'Authentication failed ' + error;
@@ -213,6 +222,171 @@ console.log(rep1.count, rep2.count);
                 templateUrl: 'ht/home/index.html',
                 controller: 'HomeCtrl',
                 controllerAs: 'hc'
+            });
+    }
+
+})();
+
+;(function() {
+    'use strict';
+
+    angular.module('MyFitTracker.Profile', [
+        'MyFitTracker.Fire',
+        'MyFitTracker.Auth'
+    ])
+        .controller('profileCtrl', profileController)
+        .factory('profileFct', profileFactory)
+        .config(profileConfig);
+
+    // @ngInject
+    function profileController($stateParams, profileFct) {
+        var self = this;
+
+        self.id = $stateParams.id;
+
+        profileFct.getUser(self.id)
+            .then(function(_user) {
+                self.user = _user;
+            });
+    }
+
+    // @ngInject
+    function profileFactory(dbc, $firebaseObject) {
+        var o = {};
+
+        var ref = dbc.getRef();
+        var usersRef = ref.child('users');
+
+        o.getUser = function(_id) {
+            return $firebaseObject(usersRef.child(_id)).$loaded();
+        };
+
+        return o;
+    }
+
+    // @ngInject
+    function profileConfig($stateProvider) {
+        $stateProvider
+            .state('profile', {
+                resolve: {
+                    auth: /*@ngInject*/ function(Authentication) {
+                        return Authentication.require();
+                    }
+                },
+                url: '/profile/:id',
+                templateUrl: 'ht/profile/profile.html',
+                controller: 'profileCtrl',
+                controllerAs: 'pc'
+            });
+    }
+
+})();
+
+;(function() {
+    'use strict';
+
+    angular.module('MyFitTracker.Sign', [
+        'MyFitTracker.Auth',
+        'ui.router'
+    ])
+        .controller('signInCtrl', signInController)
+        .controller('signUpCtrl', signUpController)
+        .config(signConfig);
+
+    // @ngInject
+    function signUpController(Authentication, $state) {
+        var self = this;
+
+        function clean() {
+            self.user = {
+                'email': null,
+                'password': null,
+                'fullname': null
+            };
+        }
+
+        clean();
+
+        self.facebookSignUp = function() {
+            Authentication.facebookSignUp()
+                .then(function(e) {
+                    $state.go('Home');
+                });
+        };
+
+        self.signUp = function() {
+            Authentication.registerUser(self.user)
+                .then(function(e) {
+                    clean();
+                    $state.go('Users');
+                });
+        };
+    }
+
+    // @ngInject
+    function signInController(Authentication, $state, $rootScope) {
+        var self = this;
+
+        function clean() {
+            self.user = {
+                'email': null,
+                'password': null,
+                'fullname': null
+            };
+        }
+
+        clean();
+
+        self.facebookSignIn = function() {
+            Authentication.facebookSignIn()
+                .then(function(e) {
+                    $state.go('Home');
+                });
+        };
+
+        self.signIn = function() {
+            Authentication.login(self.user)
+                .then(function(e) {
+                    clean();
+                    $state.go('User');
+                })
+                .catch(function(error) {
+                    //console.log('Error ', e);
+                    switch (error.code) {
+                        case "INVALID_EMAIL":
+                            console.log("INVALID_EMAIL: The specified user account email is invalid.");
+                            $rootScope.addAlert("INVALID_EMAIL: The specified user account email is invalid.");
+                            break;
+                        case "INVALID_PASSWORD":
+                            console.log("INVALID_PASSWORD: The specified user account password is incorrect.");
+                            $rootScope.addAlert("INVALID_PASSWORD: The specified user account password is incorrect.", 'danger');
+                            break;
+                        case "INVALID_USER":
+                            console.log("INVALID_USER: The specified user account does not exist.");
+                            $rootScope.addAlert("INVALID_USER: The specified user account does not exist.");
+                            break;
+                        default:
+                            console.log("COMMON ERROR: Error logging user in: ", error);
+                            $rootScope.addAlert("COMMON ERROR: Error logging user in");
+                    }
+                });
+        };
+    }
+
+    // @ngInject
+    function signConfig($stateProvider) {
+        $stateProvider
+            .state('signin', {
+                url: '/signin',
+                templateUrl: 'ht/registration/sign-in.html',
+                controller: 'signInCtrl',
+                controllerAs: 'sic'
+            })
+            .state('signup', {
+                url: '/signup',
+                templateUrl: 'ht/registration/sign-up.html',
+                controller: 'signUpCtrl',
+                controllerAs: 'suc'
             });
     }
 
@@ -10509,11 +10683,14 @@ console.log(rep1.count, rep2.count);
         .factory('Authentication', AuthenticationFactory);
 
     // @ngInject
-    function AuthenticationFactory(dbc, $firebaseAuth, $rootScope) {
+    function AuthenticationFactory(dbc, $firebaseAuth, $rootScope, $firebaseObject, $state) {
         var o = {};
 
-        var authObj = $firebaseAuth(dbc.getRef());
-        console.log(authObj);
+        var ref = dbc.getRef();
+        var authObj = $firebaseAuth(ref);
+        var usersRef = ref.child('users');
+
+        //console.log(authObj);
 /*
         o.auth = function() {
             console.log('=== auth ===');
@@ -10549,35 +10726,54 @@ console.log(rep1.count, rep2.count);
         };
 
         o.checkAuth = function() {
+/*
             console.log('=== checkAuth ===');
 
             var authData = authObj.$getAuth();
 
             if (authData) {
                 console.log('=== checkAuth === Logged in as ' + authData.uid);
-                $rootScope.userLoggedIn = true;
             }
             else {
                 console.log('Logged out');
-                $rootScope.userLoggedIn = false;
             }
+*/
         };
 
         o.onAuth = function() {
             console.log('=== onAuth ===');
 
             authObj.$onAuth(function(authData) {
-/*
                 if (authData) {
-                    authObj.$unauth();
-                    console.log('=== onAuth === Logged in as ' + authData.uid);
+                    $rootScope.userLoggedIn = true;
+                    var user = $firebaseObject(usersRef.child(authData.uid));
+                    user.$loaded(function(_user) {
+                        $rootScope.currentUser.fullName = _user.fullname;
+                        $rootScope.currentUser.id = _user.$id;
+                    });
+                    //console.log('=== onAuth === Logged in as ', authData.uid, ', user email = ', authData.password.email);
+                    console.log('=== onAuth === Logged in as ', authData.uid);
                 }
                 else {
-                    console.log('Logged out');
+                    $rootScope.userLoggedIn = false;
+                    $rootScope.currentUser.fullname = null;
+                    $rootScope.currentUser.id = null;
+                    console.log('Not logged in');
                 }
-*/
-                authObj.$unauth();
-                console.log('=== onAuth === Logged out');
+                //o.checkAuth();
+            });
+        };
+
+        o.onAuth();
+
+        o.require = function() {
+            return authObj.$requireAuth();
+        };
+
+        o.login = function(_user) {
+            return authObj.$authWithPassword({
+                email: _user.email,
+                password: _user.password
             });
         };
 
@@ -10586,29 +10782,64 @@ console.log(rep1.count, rep2.count);
         };
 
         o.registerUser = function(newUser) {
-            console.log('=== registerUser ===');
+            console.log('=== registerUser === ' + newUser.email + ', ' + newUser.password);
 
-            authObj.$createUser(
-                /*
+            return authObj.$createUser(
                 {
-                    email: 'albertaino@gmail.com',
-                    password: 'firebasePass'
-                }*/newUser)
-                .then(function(userData) {
-                    console.log('User registered with id = ' + userData.uid);
-                    return authObj.$authWithPassword(newUser)
-                        .then(function(authData) {
-                            console.log('=== authObj.createUser === Logged in as ' + authData.uid);
-                        })
-                        .catch(function(error) {
-                            console.error('Authentication failed ' + error);
-                        });
+                    email: newUser.email,
+                    password: newUser.password
+                })
+                .then(function(authData) {
+                    console.log('User registered with id = ' + authData.uid);
+
+                    // Create new user in Users list
+                    usersRef.child(authData.uid).set({
+                        fullname: newUser.fullname || 'Dear Friend',
+                        email: newUser.email,
+                        regDate: Firebase.ServerValue.TIMESTAMP
+                    });
+
+                    return authObj.$authWithPassword({
+                        email: newUser.email,
+                        password: newUser.password
+                    });
+                })
+                .then(function(authData) {
+                    console.log('=== authObj.createUser === Logged in as ' + authData.uid);
+                })
+                .catch(function(error) {
+                    console.error('Authentication failed ' + error);
                 });
         };
 
         o.logOut = function() {
             authObj.$unauth();
-            o.checkAuth();
+            //o.checkAuth();
+            $state.go('Home');
+        };
+
+        o.facebookSignUp = function() {
+            return authObj.$authWithOAuthPopup('facebook')
+                .then(function(authData) {
+
+                    // Create new user in Users list
+                    usersRef.child(authData.uid).set({
+                        fullname: authData.facebook.displayName,
+                        email: null,
+                        facebookId: authData.facebook.id,
+                        avatar: authData.facebook.profileImageURL,
+                        regDate: Firebase.ServerValue.TIMESTAMP
+                    });
+
+                    console.log('Facebook sign up ', authData);
+                });
+        };
+
+        o.facebookSignIn = function() {
+            return authObj.$authWithOAuthPopup('facebook')
+                .then(function(authData) {
+                    console.log('Facebook sign in ', authData);
+                });
         };
 
         return o;
